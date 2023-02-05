@@ -1,0 +1,26 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    environment: docker-hub
+    steps:
+    - name: Check out the repo
+      uses: actions/checkout@v3
+    - name: Log in Docker hub
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag nikitinvd/filebeat:7.14.0
+    - name: Publish the Docker image
+      run: docker push nikitinvd/filebeat:7.14.0
+      
